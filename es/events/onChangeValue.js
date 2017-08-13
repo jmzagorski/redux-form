@@ -1,4 +1,5 @@
 import getValue from './getValue';
+import isReactNative from '../isReactNative';
 
 
 var onChangeValue = function onChangeValue(event, _ref) {
@@ -7,7 +8,7 @@ var onChangeValue = function onChangeValue(event, _ref) {
       normalize = _ref.normalize;
 
   // read value from input
-  var value = getValue(event);
+  var value = getValue(event, isReactNative);
 
   // parse value if we have a parser
   if (parse) {

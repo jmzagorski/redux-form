@@ -99,7 +99,7 @@ var blur = function blur(form, field, value, touch) {
   };
 };
 
-var change = function change(form, field, value, touch, persistentsubmit) {
+var change = function change(form, field, value, touch, persistentSubmitErrors) {
   return {
     type: CHANGE,
     meta: { form: form, field: field, touch: touch, persistentSubmitErrors: persistentSubmitErrors },

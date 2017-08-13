@@ -14,8 +14,14 @@ var getSelectedValues = function getSelectedValues(options) {
   return result;
 };
 
-var getValue = function getValue(event) {
+var getValue = function getValue(event, isReactNative) {
   if (isEvent(event)) {
+    if (!isReactNative && event.nativeEvent && event.nativeEvent.text !== undefined) {
+      return event.nativeEvent.text;
+    }
+    if (isReactNative && event.nativeEvent !== undefined) {
+      return event.nativeEvent.text;
+    }
     var detypedEvent = event;
     var _detypedEvent$target = detypedEvent.target,
         type = _detypedEvent$target.type,

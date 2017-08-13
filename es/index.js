@@ -1,6 +1,5 @@
 import actions from './actions';
 import * as _actionTypes from './actionTypes';
-export { configure } from './connect';
 export { default as defaultShouldAsyncValidate } from './defaultShouldAsyncValidate';
 export { default as defaultShouldValidate } from './defaultShouldValidate';
 export { default as SubmissionError } from './SubmissionError';
@@ -22,8 +21,8 @@ export { default as isValid } from './isValid';
 export { default as isSubmitting } from './isSubmitting';
 export { default as hasSubmitSucceeded } from './hasSubmitSucceeded';
 export { default as hasSubmitFailed } from './hasSubmitFailed';
-export { default as reduxForm } from './reduxForm';
 export { default as reducer } from './reducer';
+export { default as getEventValue } from './events/onChangeValue';
 export var actionTypes = _actionTypes;
 export var arrayInsert = actions.arrayInsert;
 export var arrayMove = actions.arrayMove;

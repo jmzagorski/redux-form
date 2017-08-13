@@ -5,18 +5,26 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
+import hoistStatics from 'hoist-non-react-statics';
 import isPromise from 'is-promise';
 
 import PropTypes from 'prop-types';
-import connect from './connect';
+import { Component, createElement } from 'react';
+import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import importedActions from './actions';
 import asyncValidation from './asyncValidation';
@@ -30,7 +38,13 @@ import createIsValid from './selectors/isValid';
 import plain from './structure/plain';
 import getDisplayName from './util/getDisplayName';
 
+
+var isClassComponent = function isClassComponent(Component) {
+  return Boolean(Component && Component.prototype && _typeof(Component.prototype.isReactComponent) === 'object');
+};
+
 // extract field-specific actions
+
 var arrayInsert = importedActions.arrayInsert,
     arrayMove = importedActions.arrayMove,
     arrayPop = importedActions.arrayPop,
@@ -72,7 +86,6 @@ var checkSubmit = function checkSubmit(submit) {
  * The decorator that is the main API to redux-form
  */
 var createReduxForm = function createReduxForm(structure) {
-  // library passes in a plain struture
   var deepEqual = structure.deepEqual,
       empty = structure.empty,
       getIn = structure.getIn,
@@ -98,35 +111,28 @@ var createReduxForm = function createReduxForm(structure) {
       forceUnregisterOnUnmount: false
     }, initialConfig);
 
-    // users passes in a warpped component
     return function (WrappedComponent) {
-      var Form = function () {
+      var Form = function (_Component) {
+        _inherits(Form, _Component);
+
         function Form() {
-          var _this = this;
+          var _ref;
+
+          var _temp, _this, _ret;
 
           _classCallCheck(this, Form);
 
-          this.destroyed = false;
-          this.fieldValidators = {};
-          this.lastFieldValidatorKeys = [];
-          this.fieldWarners = {};
-          this.lastFieldWarnerKeys = [];
-          this.innerOnSubmit = undefined;
-          this.submitPromise = undefined;
+          for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+          }
 
-          this.getValues = function () {
+          return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = Form.__proto__ || Object.getPrototypeOf(Form)).call.apply(_ref, [this].concat(args))), _this), _this.destroyed = false, _this.fieldValidators = {}, _this.lastFieldValidatorKeys = [], _this.fieldWarners = {}, _this.lastFieldWarnerKeys = [], _this.innerOnSubmit = undefined, _this.submitPromise = undefined, _this.getValues = function () {
             return _this.props.values;
-          };
-
-          this.isValid = function () {
+          }, _this.isValid = function () {
             return _this.props.valid;
-          };
-
-          this.isPristine = function () {
+          }, _this.isPristine = function () {
             return _this.props.pristine;
-          };
-
-          this.register = function (name, type, getValidator, getWarner) {
+          }, _this.register = function (name, type, getValidator, getWarner) {
             _this.props.registerField(name, type);
             if (getValidator) {
               _this.fieldValidators[name] = getValidator;
@@ -134,9 +140,7 @@ var createReduxForm = function createReduxForm(structure) {
             if (getWarner) {
               _this.fieldWarners[name] = getWarner;
             }
-          };
-
-          this.unregister = function (name) {
+          }, _this.unregister = function (name) {
             if (!_this.destroyed) {
               if (_this.props.destroyOnUnmount || _this.props.forceUnregisterOnUnmount) {
                 _this.props.unregisterField(name);
@@ -146,9 +150,7 @@ var createReduxForm = function createReduxForm(structure) {
                 _this.props.unregisterField(name, false);
               }
             }
-          };
-
-          this.getFieldList = function (options) {
+          }, _this.getFieldList = function (options) {
             var registeredFields = _this.props.registeredFields;
             var list = [];
             if (!registeredFields) {
@@ -164,9 +166,7 @@ var createReduxForm = function createReduxForm(structure) {
               acc.push(key);
               return acc;
             }, list));
-          };
-
-          this.getValidators = function () {
+          }, _this.getValidators = function () {
             var validators = {};
             Object.keys(_this.fieldValidators).forEach(function (name) {
               var validator = _this.fieldValidators[name]();
@@ -175,14 +175,10 @@ var createReduxForm = function createReduxForm(structure) {
               }
             });
             return validators;
-          };
-
-          this.generateValidator = function () {
+          }, _this.generateValidator = function () {
             var validators = _this.getValidators();
             return Object.keys(validators).length ? generateValidator(validators, structure) : undefined;
-          };
-
-          this.getWarners = function () {
+          }, _this.getWarners = function () {
             var warners = {};
             Object.keys(_this.fieldWarners).forEach(function (name) {
               var warner = _this.fieldWarners[name]();
@@ -191,26 +187,22 @@ var createReduxForm = function createReduxForm(structure) {
               }
             });
             return warners;
-          };
-
-          this.generateWarner = function () {
+          }, _this.generateWarner = function () {
             var warners = _this.getWarners();
             return Object.keys(warners).length ? generateValidator(warners, structure) : undefined;
-          };
-
-          this.asyncValidate = function (name, value) {
-            var _props = _this.props,
-                asyncBlurFields = _props.asyncBlurFields,
-                asyncErrors = _props.asyncErrors,
-                asyncValidate = _props.asyncValidate,
-                dispatch = _props.dispatch,
-                initialized = _props.initialized,
-                pristine = _props.pristine,
-                shouldAsyncValidate = _props.shouldAsyncValidate,
-                startAsyncValidation = _props.startAsyncValidation,
-                stopAsyncValidation = _props.stopAsyncValidation,
-                syncErrors = _props.syncErrors,
-                values = _props.values;
+          }, _this.asyncValidate = function (name, value) {
+            var _this$props = _this.props,
+                asyncBlurFields = _this$props.asyncBlurFields,
+                asyncErrors = _this$props.asyncErrors,
+                asyncValidate = _this$props.asyncValidate,
+                dispatch = _this$props.dispatch,
+                initialized = _this$props.initialized,
+                pristine = _this$props.pristine,
+                shouldAsyncValidate = _this$props.shouldAsyncValidate,
+                startAsyncValidation = _this$props.startAsyncValidation,
+                stopAsyncValidation = _this$props.stopAsyncValidation,
+                syncErrors = _this$props.syncErrors,
+                values = _this$props.values;
 
             var submitting = !name;
             if (asyncValidate) {
@@ -230,32 +222,24 @@ var createReduxForm = function createReduxForm(structure) {
                 }, startAsyncValidation, stopAsyncValidation, name);
               }
             }
-          };
-
-          this.submitCompleted = function (result) {
+          }, _this.submitCompleted = function (result) {
             delete _this.submitPromise;
             return result;
-          };
-
-          this.submitFailed = function (error) {
+          }, _this.submitFailed = function (error) {
             delete _this.submitPromise;
             return error;
-          };
-
-          this.listenToSubmit = function (promise) {
+          }, _this.listenToSubmit = function (promise) {
             if (!isPromise(promise)) {
               return promise;
             }
             _this.submitPromise = promise;
             return promise.then(_this.submitCompleted, _this.submitFailed);
-          };
-
-          this.submit = function (submitOrEvent) {
-            var _props2 = _this.props,
-                onSubmit = _props2.onSubmit,
-                blur = _props2.blur,
-                change = _props2.change,
-                dispatch = _props2.dispatch;
+          }, _this.submit = function (submitOrEvent) {
+            var _this$props2 = _this.props,
+                onSubmit = _this$props2.onSubmit,
+                blur = _this$props2.blur,
+                change = _this$props2.change,
+                dispatch = _this$props2.dispatch;
 
 
             if (!submitOrEvent || silenceEvent(submitOrEvent)) {
@@ -272,21 +256,17 @@ var createReduxForm = function createReduxForm(structure) {
             } else {
               // submitOrEvent is the submit function: return deferred submit thunk
               return silenceEvents(function () {
-                return !_this.submitPromise && _this.listenToSubmit(handleSubmit(
-                // checks and returns the submit function
-                checkSubmit(submitOrEvent), _extends({}, _this.props, bindActionCreators({ blur: blur, change: change }, dispatch)), _this.props.validExceptSubmit, _this.asyncValidate, _this.getFieldList({ excludeFieldArray: true })));
+                return !_this.submitPromise && _this.listenToSubmit(handleSubmit(checkSubmit(submitOrEvent), _extends({}, _this.props, bindActionCreators({ blur: blur, change: change }, dispatch)), _this.props.validExceptSubmit, _this.asyncValidate, _this.getFieldList({ excludeFieldArray: true })));
               });
             }
-          };
-
-          this.reset = function () {
+          }, _this.reset = function () {
             return _this.props.reset();
-          };
+          }, _temp), _possibleConstructorReturn(_this, _ret);
         }
 
         _createClass(Form, [{
-          key: 'propsChanged',
-          value: function propsChanged() {
+          key: 'getChildContext',
+          value: function getChildContext() {
             var _this2 = this;
 
             return {
@@ -324,9 +304,9 @@ var createReduxForm = function createReduxForm(structure) {
         }, {
           key: 'updateSyncErrorsIfNeeded',
           value: function updateSyncErrorsIfNeeded(nextSyncErrors, nextError, lastSyncErrors) {
-            var _props3 = this.props,
-                error = _props3.error,
-                updateSyncErrors = _props3.updateSyncErrors;
+            var _props = this.props,
+                error = _props.error,
+                updateSyncErrors = _props.updateSyncErrors;
 
             var noErrors = (!lastSyncErrors || !Object.keys(lastSyncErrors).length) && !error;
             var nextNoErrors = (!nextSyncErrors || !Object.keys(nextSyncErrors).length) && !nextError;
@@ -346,9 +326,9 @@ var createReduxForm = function createReduxForm(structure) {
         }, {
           key: 'submitIfNeeded',
           value: function submitIfNeeded(nextProps) {
-            var _props4 = this.props,
-                clearSubmit = _props4.clearSubmit,
-                triggerSubmit = _props4.triggerSubmit;
+            var _props2 = this.props,
+                clearSubmit = _props2.clearSubmit,
+                triggerSubmit = _props2.triggerSubmit;
 
             if (!triggerSubmit && nextProps.triggerSubmit) {
               clearSubmit();
@@ -358,10 +338,10 @@ var createReduxForm = function createReduxForm(structure) {
         }, {
           key: 'validateIfNeeded',
           value: function validateIfNeeded(nextProps) {
-            var _props5 = this.props,
-                shouldValidate = _props5.shouldValidate,
-                validate = _props5.validate,
-                values = _props5.values;
+            var _props3 = this.props,
+                shouldValidate = _props3.shouldValidate,
+                validate = _props3.validate,
+                values = _props3.values;
 
             var fieldLevelValidate = this.generateValidator();
             if (validate || fieldLevelValidate) {
@@ -392,10 +372,10 @@ var createReduxForm = function createReduxForm(structure) {
         }, {
           key: 'updateSyncWarningsIfNeeded',
           value: function updateSyncWarningsIfNeeded(nextSyncWarnings, nextWarning, lastSyncWarnings) {
-            var _props6 = this.props,
-                warning = _props6.warning,
-                syncWarnings = _props6.syncWarnings,
-                updateSyncWarnings = _props6.updateSyncWarnings;
+            var _props4 = this.props,
+                warning = _props4.warning,
+                syncWarnings = _props4.syncWarnings,
+                updateSyncWarnings = _props4.updateSyncWarnings;
 
             var noWarnings = (!syncWarnings || !Object.keys(syncWarnings).length) && !warning;
             var nextNoWarnings = (!nextSyncWarnings || !Object.keys(nextSyncWarnings).length) && !nextWarning;
@@ -406,10 +386,10 @@ var createReduxForm = function createReduxForm(structure) {
         }, {
           key: 'warnIfNeeded',
           value: function warnIfNeeded(nextProps) {
-            var _props7 = this.props,
-                shouldValidate = _props7.shouldValidate,
-                warn = _props7.warn,
-                values = _props7.values;
+            var _props5 = this.props,
+                shouldValidate = _props5.shouldValidate,
+                warn = _props5.warn,
+                values = _props5.values;
 
             var fieldLevelWarn = this.generateWarner();
             if (warn || fieldLevelWarn) {
@@ -481,12 +461,11 @@ var createReduxForm = function createReduxForm(structure) {
             });
           }
         }, {
-          key: 'detached',
-          value: function detached() {
-            if (WrappedComponent.detached) WrapperComponent.detached();
-            var _props8 = this.props,
-                destroyOnUnmount = _props8.destroyOnUnmount,
-                destroy = _props8.destroy;
+          key: 'componentWillUnmount',
+          value: function componentWillUnmount() {
+            var _props6 = this.props,
+                destroyOnUnmount = _props6.destroyOnUnmount,
+                destroy = _props6.destroy;
 
             if (destroyOnUnmount) {
               this.destroyed = true;
@@ -494,77 +473,74 @@ var createReduxForm = function createReduxForm(structure) {
             }
           }
         }, {
-          key: 'activate',
-          value: function activate() {
-            if (WrappedComponent.activate) WrapperComponent.activate();
-
+          key: 'render',
+          value: function render() {
             // remove some redux-form config-only props
             /* eslint-disable no-unused-vars */
-
-            var _props9 = this.props,
-                anyTouched = _props9.anyTouched,
-                arrayInsert = _props9.arrayInsert,
-                arrayMove = _props9.arrayMove,
-                arrayPop = _props9.arrayPop,
-                arrayPush = _props9.arrayPush,
-                arrayRemove = _props9.arrayRemove,
-                arrayRemoveAll = _props9.arrayRemoveAll,
-                arrayShift = _props9.arrayShift,
-                arraySplice = _props9.arraySplice,
-                arraySwap = _props9.arraySwap,
-                arrayUnshift = _props9.arrayUnshift,
-                asyncErrors = _props9.asyncErrors,
-                asyncValidate = _props9.asyncValidate,
-                asyncValidating = _props9.asyncValidating,
-                blur = _props9.blur,
-                change = _props9.change,
-                clearSubmit = _props9.clearSubmit,
-                destroy = _props9.destroy,
-                destroyOnUnmount = _props9.destroyOnUnmount,
-                forceUnregisterOnUnmount = _props9.forceUnregisterOnUnmount,
-                dirty = _props9.dirty,
-                dispatch = _props9.dispatch,
-                enableReinitialize = _props9.enableReinitialize,
-                error = _props9.error,
-                focus = _props9.focus,
-                form = _props9.form,
-                getFormState = _props9.getFormState,
-                initialize = _props9.initialize,
-                initialized = _props9.initialized,
-                initialValues = _props9.initialValues,
-                invalid = _props9.invalid,
-                keepDirtyOnReinitialize = _props9.keepDirtyOnReinitialize,
-                pristine = _props9.pristine,
-                propNamespace = _props9.propNamespace,
-                registeredFields = _props9.registeredFields,
-                registerField = _props9.registerField,
-                reset = _props9.reset,
-                setSubmitFailed = _props9.setSubmitFailed,
-                setSubmitSucceeded = _props9.setSubmitSucceeded,
-                shouldAsyncValidate = _props9.shouldAsyncValidate,
-                shouldValidate = _props9.shouldValidate,
-                startAsyncValidation = _props9.startAsyncValidation,
-                startSubmit = _props9.startSubmit,
-                stopAsyncValidation = _props9.stopAsyncValidation,
-                stopSubmit = _props9.stopSubmit,
-                submitting = _props9.submitting,
-                submitFailed = _props9.submitFailed,
-                submitSucceeded = _props9.submitSucceeded,
-                touch = _props9.touch,
-                touchOnBlur = _props9.touchOnBlur,
-                touchOnChange = _props9.touchOnChange,
-                persistentSubmitErrors = _props9.persistentSubmitErrors,
-                syncErrors = _props9.syncErrors,
-                syncWarnings = _props9.syncWarnings,
-                unregisterField = _props9.unregisterField,
-                untouch = _props9.untouch,
-                updateSyncErrors = _props9.updateSyncErrors,
-                updateSyncWarnings = _props9.updateSyncWarnings,
-                valid = _props9.valid,
-                validExceptSubmit = _props9.validExceptSubmit,
-                values = _props9.values,
-                warning = _props9.warning,
-                rest = _objectWithoutProperties(_props9, ['anyTouched', 'arrayInsert', 'arrayMove', 'arrayPop', 'arrayPush', 'arrayRemove', 'arrayRemoveAll', 'arrayShift', 'arraySplice', 'arraySwap', 'arrayUnshift', 'asyncErrors', 'asyncValidate', 'asyncValidating', 'blur', 'change', 'clearSubmit', 'destroy', 'destroyOnUnmount', 'forceUnregisterOnUnmount', 'dirty', 'dispatch', 'enableReinitialize', 'error', 'focus', 'form', 'getFormState', 'initialize', 'initialized', 'initialValues', 'invalid', 'keepDirtyOnReinitialize', 'pristine', 'propNamespace', 'registeredFields', 'registerField', 'reset', 'setSubmitFailed', 'setSubmitSucceeded', 'shouldAsyncValidate', 'shouldValidate', 'startAsyncValidation', 'startSubmit', 'stopAsyncValidation', 'stopSubmit', 'submitting', 'submitFailed', 'submitSucceeded', 'touch', 'touchOnBlur', 'touchOnChange', 'persistentSubmitErrors', 'syncErrors', 'syncWarnings', 'unregisterField', 'untouch', 'updateSyncErrors', 'updateSyncWarnings', 'valid', 'validExceptSubmit', 'values', 'warning']);
+            var _props7 = this.props,
+                anyTouched = _props7.anyTouched,
+                arrayInsert = _props7.arrayInsert,
+                arrayMove = _props7.arrayMove,
+                arrayPop = _props7.arrayPop,
+                arrayPush = _props7.arrayPush,
+                arrayRemove = _props7.arrayRemove,
+                arrayRemoveAll = _props7.arrayRemoveAll,
+                arrayShift = _props7.arrayShift,
+                arraySplice = _props7.arraySplice,
+                arraySwap = _props7.arraySwap,
+                arrayUnshift = _props7.arrayUnshift,
+                asyncErrors = _props7.asyncErrors,
+                asyncValidate = _props7.asyncValidate,
+                asyncValidating = _props7.asyncValidating,
+                blur = _props7.blur,
+                change = _props7.change,
+                clearSubmit = _props7.clearSubmit,
+                destroy = _props7.destroy,
+                destroyOnUnmount = _props7.destroyOnUnmount,
+                forceUnregisterOnUnmount = _props7.forceUnregisterOnUnmount,
+                dirty = _props7.dirty,
+                dispatch = _props7.dispatch,
+                enableReinitialize = _props7.enableReinitialize,
+                error = _props7.error,
+                focus = _props7.focus,
+                form = _props7.form,
+                getFormState = _props7.getFormState,
+                initialize = _props7.initialize,
+                initialized = _props7.initialized,
+                initialValues = _props7.initialValues,
+                invalid = _props7.invalid,
+                keepDirtyOnReinitialize = _props7.keepDirtyOnReinitialize,
+                pristine = _props7.pristine,
+                propNamespace = _props7.propNamespace,
+                registeredFields = _props7.registeredFields,
+                registerField = _props7.registerField,
+                reset = _props7.reset,
+                setSubmitFailed = _props7.setSubmitFailed,
+                setSubmitSucceeded = _props7.setSubmitSucceeded,
+                shouldAsyncValidate = _props7.shouldAsyncValidate,
+                shouldValidate = _props7.shouldValidate,
+                startAsyncValidation = _props7.startAsyncValidation,
+                startSubmit = _props7.startSubmit,
+                stopAsyncValidation = _props7.stopAsyncValidation,
+                stopSubmit = _props7.stopSubmit,
+                submitting = _props7.submitting,
+                submitFailed = _props7.submitFailed,
+                submitSucceeded = _props7.submitSucceeded,
+                touch = _props7.touch,
+                touchOnBlur = _props7.touchOnBlur,
+                touchOnChange = _props7.touchOnChange,
+                persistentSubmitErrors = _props7.persistentSubmitErrors,
+                syncErrors = _props7.syncErrors,
+                syncWarnings = _props7.syncWarnings,
+                unregisterField = _props7.unregisterField,
+                untouch = _props7.untouch,
+                updateSyncErrors = _props7.updateSyncErrors,
+                updateSyncWarnings = _props7.updateSyncWarnings,
+                valid = _props7.valid,
+                validExceptSubmit = _props7.validExceptSubmit,
+                values = _props7.values,
+                warning = _props7.warning,
+                rest = _objectWithoutProperties(_props7, ['anyTouched', 'arrayInsert', 'arrayMove', 'arrayPop', 'arrayPush', 'arrayRemove', 'arrayRemoveAll', 'arrayShift', 'arraySplice', 'arraySwap', 'arrayUnshift', 'asyncErrors', 'asyncValidate', 'asyncValidating', 'blur', 'change', 'clearSubmit', 'destroy', 'destroyOnUnmount', 'forceUnregisterOnUnmount', 'dirty', 'dispatch', 'enableReinitialize', 'error', 'focus', 'form', 'getFormState', 'initialize', 'initialized', 'initialValues', 'invalid', 'keepDirtyOnReinitialize', 'pristine', 'propNamespace', 'registeredFields', 'registerField', 'reset', 'setSubmitFailed', 'setSubmitSucceeded', 'shouldAsyncValidate', 'shouldValidate', 'startAsyncValidation', 'startSubmit', 'stopAsyncValidation', 'stopSubmit', 'submitting', 'submitFailed', 'submitSucceeded', 'touch', 'touchOnBlur', 'touchOnChange', 'persistentSubmitErrors', 'syncErrors', 'syncWarnings', 'unregisterField', 'untouch', 'updateSyncErrors', 'updateSyncWarnings', 'valid', 'validExceptSubmit', 'values', 'warning']);
             /* eslint-enable no-unused-vars */
 
 
@@ -595,15 +571,15 @@ var createReduxForm = function createReduxForm(structure) {
               warning: warning
             });
             var propsToPass = _extends({}, propNamespace ? _defineProperty({}, propNamespace, reduxFormProps) : reduxFormProps, rest);
-            propsToPass.ref = 'wrapped';
-            for (var prop in propsToPass) {
-              WrappedComponent[prop] = propsToPass[prop];
+            if (isClassComponent(WrappedComponent)) {
+              propsToPass.ref = 'wrapped';
             }
+            return createElement(WrappedComponent, propsToPass);
           }
         }]);
 
         return Form;
-      }();
+      }(Component);
 
       Form.displayName = 'Form(' + getDisplayName(WrappedComponent) + ')';
       Form.WrappedComponent = WrappedComponent;
@@ -732,12 +708,17 @@ var createReduxForm = function createReduxForm(structure) {
           return computedActions;
         };
       }, undefined, { withRef: true });
+      var ConnectedForm = hoistStatics(connector(Form), WrappedComponent);
+      ConnectedForm.defaultProps = config;
 
       // build outer component to expose instance api
+      return function (_Component2) {
+        _inherits(ReduxForm, _Component2);
 
-      var ReduxForm = function () {
         function ReduxForm() {
           _classCallCheck(this, ReduxForm);
+
+          return _possibleConstructorReturn(this, (ReduxForm.__proto__ || Object.getPrototypeOf(ReduxForm)).apply(this, arguments));
         }
 
         _createClass(ReduxForm, [{
@@ -751,19 +732,17 @@ var createReduxForm = function createReduxForm(structure) {
             return this.refs.wrapped.getWrappedInstance().reset();
           }
         }, {
-          key: 'attached',
-          value: function attached() {
-            debugger;
+          key: 'render',
+          value: function render() {
+            var _props8 = this.props,
+                initialValues = _props8.initialValues,
+                rest = _objectWithoutProperties(_props8, ['initialValues']);
 
-            var _props10 = this.props,
-                initialValues = _props10.initialValues,
-                rest = _objectWithoutProperties(_props10, ['initialValues']);
-
-            var form = new Form();
-            form.props.initalValues = fromJS(initialValues);
-            this.refs.wrapped = {
-              getWrappedInstance: form
-            };
+            return createElement(ConnectedForm, _extends({}, rest, {
+              ref: 'wrapped',
+              // convert initialValues if need to
+              initialValues: fromJS(initialValues)
+            }));
           }
         }, {
           key: 'valid',
@@ -805,9 +784,7 @@ var createReduxForm = function createReduxForm(structure) {
         }]);
 
         return ReduxForm;
-      }();
-
-      return new ReduxForm();
+      }(Component);
     };
   };
 };
