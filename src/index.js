@@ -31,6 +31,7 @@ export { default as isSubmitting } from './isSubmitting'
 export { default as hasSubmitSucceeded } from './hasSubmitSucceeded'
 export { default as hasSubmitFailed } from './hasSubmitFailed'
 export { default as reducer } from './reducer'
+export { default as getEventValue } from './events/onChangeValue';
 export const actionTypes = _actionTypes
 export const arrayInsert = actions.arrayInsert
 export const arrayMove = actions.arrayMove
